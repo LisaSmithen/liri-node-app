@@ -130,3 +130,146 @@ function logMovie(data) {
         };
         });
     }
+function spotifyThis(song) {
+    if (!song.includes("'") && !song.includes('"'))
+    song = "'" + song + "'";
+
+    console.log("spotifyThis: " + song);
+    spotify.search({
+        type: 'track',
+        query: song
+    }, function (err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        }
+        if (!data.tracks.items || !data.tracks.items.length) {
+            console.log("Sorry we could not find this song: " + song);
+            return;
+        }
+        for (var i = 0; i < data.tracks.items.length; i++) {
+            if (data.tracks.items[i].preview_url &&
+                data.tracks.items[i].name &&
+                data.tracks.items[i].album.name) {
+                logSongs(data.tracks.items[i]);
+                return;
+            }
+        };
+    });
+};
+
+function logSongs(item) {
+
+    var spotifyAppend = "(********************************** Spotify Song *********************************" + "\n" +
+    "The song name: ";
+if (item.name)
+    spotifyAppend = spotifyAppend + item.name;
+else
+    spotifyAppend = spotifyAppend + "No name";
+
+spotifyAppend = spotifyAppend + "\n" + "Album name: ";
+
+if (item.album && item.album.name)
+        spotifyAppend = spotifyAppend + item.album.name + "\n";
+    else
+        spotifyAppend = spotifyAppend + "No Album name" + "\n";
+
+    if (item.popularity)
+        spotifyAppend = spotifyAppend + "Popularity of the song: " + item.popularity + "\n";
+    else
+        spotifyAppend = spotifyAppend + "Popularity of the song: no popularity rating " + "\n";
+
+    if (item.preview_url)
+        spotifyAppend = spotifyAppend + "Song preview: " + item.preview_url + "\n";
+    else
+        spotifyAppend = spotifyAppend + "Song preview: No song preview " + "\n";
+
+    if (item.track_number)
+        spotifyAppend = spotifyAppend + "Track number: " + item.track_number + "\n";
+    else
+        spotifyAppend = spotifyAppend + "Track number: no track number  " + "\n";
+
+    if (item.artist && item.artist.name)
+        spotifyAppend = spotifyAppend + "Song's Artist: " + item.artist.name + "\n";
+    else
+        spotifyAppend = spotifyAppend + "Song's Artist: No artist " + "\n";
+
+    spotifyAppend = spotifyAppend + "*********************************************************************************)";
+    console.log(spotifyAppend);
+    fs.appendFile("log.txt", spotifyAppend, function (err) {});
+}
+
+function concertThis(bands) {
+    bands = stripEndQuotes(bands);
+    console.log(bands);
+    var bandsAppend = "";
+    var queryURL = "https://rest.bandsintown.com/artists/" + bands.trim() + "/events?app_id=12677f5a7f6ea3d8f4ed813de5bf152e"
+    request(queryURL, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+
+            try {
+                var body = JSON.parse(body);
+            } catch (e) {
+                console.log("No concert found: " + bands);
+                return;
+            }
+            if (body && body.length) {
+                logEvents(body);
+                fs.appendFile("log.txt", bandsAppend, function (err) {
+
+                });
+            } else {
+                console.log("no concert found");
+            }
+        }
+    })
+};
+
+function logEvents(event) {
+    for (var i = 0; i < event.length && i < 1; i++) {
+
+        logEvent(event[i]);
+    }
+}
+
+function logEvent(event) {
+    var dateS = moment(event.datetime).format("MM/DD/YYYY");
+     var concerts = "Venue Location: " + event.venue.city + "\n";
+    if (event.venue.name)
+        concerts = concerts + "Venue Name: " + event.venue.name + "\n";
+    else
+        concerts = concerts + "Venue Name: No Venue" + "\n";
+    if (dateS)
+        concerts = concerts + "Showing at this date: " + dateS;
+    else
+        concerts = concerts + "Showing at this date: Sorry no show dates available";
+
+    console.log(concerts);
+    fs.appendFile("log.txt", concerts, function (err) {
+
+    });
+};
+
+function doWhatItSays(command) {
+    fs.readFile('random.txt', (error, data) => {
+        if (error) {
+            throw error
+        };
+        var randomTxt = data.toString().split(',');
+        var searchText = randomTxt[1];
+        if (command === "concert")
+            concertThis(searchText);
+        else
+        if (command === "song")
+            spotifyThis(searchText);
+        else
+            movie(searchText);
+    });
+}
+function stripEndQuotes(s){
+	var t=s.length;
+	if (s.charAt(0)=='"') s=s.substring(1,t--);
+	if (s.charAt(--t)=='"') s=s.substring(0,t);
+	return s;
+}
+
+
