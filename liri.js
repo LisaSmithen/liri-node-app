@@ -54,6 +54,79 @@ if (process.argv[3] !== undefined) {
          if (process.argv[3] !== undefined) {
              command = process.argv [3];
          }
-         doWhatItSays(comman);
+         doWhatItSays(command);
          break;
-         }
+         };
+
+function movie(title) {
+    var queryURL = "http://www.omdbapi.com/?t=" + title + "&y=&plot=short&3f2d0f47=trilogy";
+    request(queryURL, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            if (body) {
+                var data = JSON.parse(body);
+                if (data.Error == 'Movie not found!') {
+                    var noMovie = ("\n**********************Sorry NO MOVIE***************************\nOMDB could not find any movies that matched that title.  Please try again.\n********************************************************************************\n");
+                    console.log(noMovie)
+                    fs.appendFile("log.txt", noMovie, function (err) {
+                        if (err) {
+                            return console.log("Movie data did not append to log.txt file.");
+                        };
+                    });
+                } else if (!data.Ratings || data.Ratings.length < 2) {
+                    logMovie(data); 
+
+                    return
+                } else if (data.Ratings[1].Value !== undefined) {
+                    var movieAppend = ("\n********************************** MOVIE THIS **********************************\nTitle: " + data.Title + "\nRelease Year: " + data.Year + "\nIMDB Rating: " + data.imdbRating + "\nRotten Tomatoes Rating: " + data.Ratings[1].Value + "\nCountry movie produced in: " + data.Country + "\nLanguage: " + data.Language + "\nPlot: " + data.Plot + "\nActors: " + data.Actors + "\n********************************************************************************\n");
+                    console.log(movieAppend)
+                    fs.appendFile("log.txt", movieAppend, function (err) {
+
+                    });
+                };
+            };
+        };
+
+    });
+};
+
+function logMovie(data) {
+    var movieAppend = "\n********************************** MOVIE **********************************\nTitle: " + data.Title;
+
+
+    if (data.Year)
+        movieAppend = movieAppend + "\nRelease Year: " + data.Year;
+    else
+        movieAppend = movieAppend + "\nRelease Year: No release year";
+
+    if (data.imdbRating)
+        movieAppend = movieAppend + "\nIMDB Rating: " + data.imdbRating;
+    else
+        movieAppend = movieAppend + "\nIMDB Rating: No Rating";
+
+    if (data.Country)
+        movieAppend = movieAppend + "\nRotten Tomatoes Rating: No Rotten Tomatoes Rating\nCountry movie produced in: " + data.Country;
+    else
+        movieAppend = movieAppend + "\nRotten Tomatoes Rating: No Rotten Tomatoes Rating\nCountry movie produced in: N/A";
+
+    if (data.Language)
+        movieAppend = movieAppend + "\nLanguage: " + data.Language;
+    else
+        movieAppend = movieAppend + "\nLanguage: N/A";
+
+    if (data.plot)
+        movieAppend = movieAppend + "\nPlot: " + data.Plot;
+    else
+        movieAppend = movieAppend + "\nPlot: N/A";
+    if (data.Actors)
+        movieAppend = movieAppend + "\nActors: " + data.Actors;
+    else
+        movieAppend = movieAppend + "\nActors: N/A";
+
+    movieAppend = movieAppend + "\n********************************************************************************\n";
+    console.log(movieAppend)
+    fs.appendFile("log.txt", movieAppend, function (err) {
+        if (err){
+            return console.log("Movie data did not connect to log.txt file.");
+        };
+        });
+    }
