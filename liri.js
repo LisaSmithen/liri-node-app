@@ -10,6 +10,20 @@ moment = require("moment"),
 keys = require("./keys.js"),
 Spotify = require('node-spotify-api'),
 spotify = new Spotify({
-    id:
-    secret:
-})
+    id: "974a6303de3b438a96b52d84affdd367",
+    secret: "6e5cb16fc12440ee96456db5eaef73ef"
+});
+
+infoInput = process.argv,
+action =process.argv[2],
+param = "";
+
+if (!action || !infoInput || !infoInput.length) {
+    process.exit(1);
+};
+
+if (process.argv[3] !== undefined) {
+    for (i =3; i < infoInput.length; i++) {
+        param +=infoInput[i] + "";
+    };
+ };
