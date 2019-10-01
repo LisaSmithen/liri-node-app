@@ -27,3 +27,33 @@ if (process.argv[3] !== undefined) {
         param +=infoInput[i] + "";
     };
  };
+ switch (action) {
+    case 'concert-this':
+        if (!param || param.length < 2) {
+            param = "NF";
+        }
+        concertThis(param);
+        break;
+
+     case 'spotify-this song':
+         if (!param || param.length < 2) {
+             param = "Speak To A Girl";
+         }   
+         spotifyThis(param);
+         break;
+
+     case "movie-this":
+         if (!param || param.length < 2) {
+             param = "The Hate You Give";
+         }
+         MSPointerEvent(param);
+         break;
+
+     case "do-what-it-says":
+         var command = "movie";
+         if (process.argv[3] !== undefined) {
+             command = process.argv [3];
+         }
+         doWhatItSays(comman);
+         break;
+         }
