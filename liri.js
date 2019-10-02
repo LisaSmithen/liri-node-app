@@ -5,10 +5,11 @@ function helpMenu() {
 }
 helpMenu();
 const fs = require("fs");
-var request = require("request"),
-moment = require("moment"),
-keys = require("./keys.js"),
-Spotify = require('node-spotify-api'),
+var request = require("request");
+moment = require("moment");
+keys = require("./keys.js");
+var axios = require("axios");
+Spotify = require('node-spotify-api');
 spotify = new Spotify({
     id: "974a6303de3b438a96b52d84affdd367",
     secret: "6e5cb16fc12440ee96456db5eaef73ef"
@@ -18,13 +19,15 @@ infoInput = process.argv,
 action =process.argv[2],
 param = "";
 
+
+
 if (!action || !infoInput || !infoInput.length) {
     process.exit(1);
 };
 
 if (process.argv[3] !== undefined) {
     for (i =3; i < infoInput.length; i++) {
-        param +=infoInput[i] + "";
+        param +=infoInput[i] + " ";
     };
  };
  switch (action) {
@@ -35,10 +38,11 @@ if (process.argv[3] !== undefined) {
         concertThis(param);
         break;
 
-     case 'spotify-this song':
+     case 'spotify-this-song':
          if (!param || param.length < 2) {
              param = "Speak To A Girl";
          }   
+         console.log("PARAM: " + param + '\n\n\n\n\n');
          spotifyThis(param);
          break;
 
@@ -46,7 +50,9 @@ if (process.argv[3] !== undefined) {
          if (!param || param.length < 2) {
              param = "The Hate You Give";
          }
-         MSPointerEvent(param);
+         console.log('In Movie Case');
+         console.log("PARAM: " + param + '\n\n\n\n\n');
+         movie(param);
          break;
 
      case "do-what-it-says":
@@ -59,34 +65,16 @@ if (process.argv[3] !== undefined) {
          };
 
 function movie(title) {
-    var queryURL = "http://www.omdbapi.com/?t=" + title + "&y=&plot=short&3f2d0f47=trilogy";
-    request(queryURL, function (error, response, body) {
-        if (!error && response.statusCode === 200) {
-            if (body) {
-                var data = JSON.parse(body);
-                if (data.Error == 'Movie not found!') {
-                    var noMovie = ("\n**********************Sorry NO MOVIE***************************\nOMDB could not find any movies that matched that title.  Please try again.\n********************************************************************************\n");
-                    console.log(noMovie)
-                    fs.appendFile("log.txt", noMovie, function (err) {
-                        if (err) {
-                            return console.log("Movie data did not append to log.txt file.");
-                        };
-                    });
-                } else if (!data.Ratings || data.Ratings.length < 2) {
-                    logMovie(data); 
-
-                    return
-                } else if (data.Ratings[1].Value !== undefined) {
-                    var movieAppend = ("\n********************************** MOVIE THIS **********************************\nTitle: " + data.Title + "\nRelease Year: " + data.Year + "\nIMDB Rating: " + data.imdbRating + "\nRotten Tomatoes Rating: " + data.Ratings[1].Value + "\nCountry movie produced in: " + data.Country + "\nLanguage: " + data.Language + "\nPlot: " + data.Plot + "\nActors: " + data.Actors + "\n********************************************************************************\n");
-                    console.log(movieAppend)
-                    fs.appendFile("log.txt", movieAppend, function (err) {
-
-                    });
-                };
-            };
-        };
-
-    });
+    var movieURL = "http://www.omdbapi.com/?t=" + title + "&y=&plot=short&apikey=trilogy";
+    axios.get(movieURL).then
+    (
+        function (response) 
+        {
+            console.log("Title: " + response.data.Title + "\n" + "Year Released: " + response.data.Released + "\n"
+            + "IMDB Rating: " + response.data.imdbRating + "\n" + "Rotten Tomatoes Rating: " + response.data.Ratings[1].Value + "\n"
+            + "Country: " + response.data.Country + "\n")
+        }
+    );
 };
 
 function logMovie(data) {
@@ -259,8 +247,10 @@ function doWhatItSays(command) {
         if (command === "concert")
             concertThis(searchText);
         else
-        if (command === "song")
+        if (command === "spotify-this-song"){
             spotifyThis(searchText);
+            console.log('WAZZUP!');
+        }
         else
             movie(searchText);
     });
