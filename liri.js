@@ -202,7 +202,7 @@ function concertThis(bands) {
     bands = stripEndQuotes(bands);
     console.log(bands);
     var bandsAppend = "";
-    var queryURL = "https://rest.bandsintown.com/artists/" + bands.trim() + "/events?app_id=12677f5a7f6ea3d8f4ed813de5bf152e"
+    var queryURL = "https://rest.bandsintown.com/artists/" + bands.trim() + "/events?app_id=e6979ded12710b3c554bb5d5ad6e993f"
     request(queryURL, function (error, response, body) {
         if (!error && response.statusCode === 200) {
 
@@ -218,7 +218,7 @@ function concertThis(bands) {
 
                 });
             } else {
-                console.log("no concert found");
+                console.log("No concert found");
             }
         }
     })
