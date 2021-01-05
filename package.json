@@ -4,7 +4,7 @@
   "description": "Node LIRI",
   "main": "keys.js",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "dotenv": "^5.0.1",
     "file-system": "^2.2.2",
     "liri": "^1.0.1",
